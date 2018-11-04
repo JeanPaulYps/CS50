@@ -22,6 +22,7 @@ int main(int argc, string argv[])
    else
    {
        printf("Usage: ./caesar key");
+       return 1;
    }
 }
 
@@ -61,8 +62,17 @@ string caesar (string text, int key)
             temp = c - 'a' ;
             //
             //printf("%i\n", temp);
-            temp = (temp + key)%27;
+            temp = (temp + key)%26;
             temp += 'a';
+            text[i] = temp;
+        }
+        else if (c >= 'A' && c <= 'Z')
+        {
+            temp = c - 'A' ;
+            //
+            //printf("%i\n", temp);
+            temp = (temp + key)%26;
+            temp += 'A';
             text[i] = temp;
         }
     }
@@ -84,3 +94,4 @@ int to_int(string in)
     
     return result;
 }
+
