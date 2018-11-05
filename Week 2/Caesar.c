@@ -7,16 +7,16 @@ bool verify_size(int argc);
 bool verify_input(string in);
 string caesar (string text, int key);
 int to_int(string in);
+char rotate_letter (char letter, int positions);
 
 int main(int argc, string argv[])
 {
-   string key = argv[1];
-   if (verify_size(argc) && verify_input(key))
+   string keyS = argv[1];
+   if (verify_size(argc) && verify_input(keyS))
    {
        string text = get_string("plaintext: ");
-       int keyt = to_int(key);
-       //printf("%i\n", to_int(key));
-       string result = caesar(text,keyt);
+       int key = to_int(keyS);
+       string result = caesar(text,key);
        printf("ciphertext: %s\n", result);
    }
    else
@@ -26,12 +26,15 @@ int main(int argc, string argv[])
    }
 }
 
+
 bool verify_size(int argc)
 {
     if (argc == 2) 
         return true;
     return false;
 }
+
+
 bool verify_input(string in)
 {
     int length = strlen(in),con = 0;
@@ -39,59 +42,62 @@ bool verify_input(string in)
     {
         for (int i = 0; i < length; i++)
         {
-            if (isdigit(in[i])) con ++;
+            if (isdigit(in[i])) 
+                con ++;
         }
         if (con == length) 
             return true;
-         return false;
+        return false;
     }
     return false;
 }
+
+
 string caesar (string text, int key)
 {
     
     int length = strlen(text);
-    //key -= '0';
-    //printf("%i\n",key);
-    char temp;   
+    char c;   
     for (int i = 0; i < length; i++)
     {
-        char c = text[i];
-        if (c >= 'a' && c <= 'z')
-        {
-            temp = c - 'a' ;
-            //
-            //printf("%i\n", temp);
-            temp = (temp + key)%26;
-            temp += 'a';
-            text[i] = temp;
-        }
-        else if (c >= 'A' && c <= 'Z')
-        {
-            temp = c - 'A' ;
-            //
-            //printf("%i\n", temp);
-            temp = (temp + key)%26;
-            temp += 'A';
-            text[i] = temp;
-        }
+        c = text[i];
+        text[i] = rotate_letter(c,key);
     }
-    //printf("%s", text);
     return text;
 }
+
+
 int to_int(string in)
 {
-    int length = strlen(in);
-    int result,digit;
+    int length = strlen(in), result;
     if (length == 2)
     {
         result = in[1] - '0';
         result += (in[0]-'0')*10;
     }
     else
-        result = in[0] - '0';
-    //printf("%i",result);
-    
+        result = in[0] - '0';    
     return result;
+}
+
+
+char rotate_letter (char letter, int positions)
+{
+    char temp;
+    if (letter >= 'a' && letter <= 'z')
+    {
+        temp = letter - 'a' ;
+        temp = (temp + positions)%26;
+        temp += 'a';
+        return temp;
+    }
+    else if (letter >= 'A' && letter <= 'Z')
+    {
+        temp = letter - 'A' ;
+        temp = (temp + positions)%26;
+        temp += 'A';
+        return temp;
+    }
+    return letter;
 }
 
