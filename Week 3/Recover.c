@@ -1,8 +1,10 @@
 #include <stdio.h>
-#include "bmp.h"
+#include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
+#define BLOCK_SIZE 512
+
+typedef uint8_t BYTE;
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -23,7 +25,6 @@ int main(int argc, char *argv[])
     BYTE jpeg_image[512];
     int con = 0;
     char jpeg_name [9];
-    bool first_jpeg = false;
     FILE *jpeg_file = NULL;
     while( fread(jpeg_image,1,sizeof(jpeg_image), memory_file)  != 0x00)
     {
@@ -33,35 +34,23 @@ int main(int argc, char *argv[])
             jpeg_image[2] == 0xff &&
             (jpeg_image[3] & 0xf0) == 0xe0)
             {
-                if (!first_jpeg)
-                {
-                    first_jpeg = true;
-                    //Set jpeg name
-                    sprintf(jpeg_name, "%03i.jpeg",con);
-                    //Create a jpeg file
-                    jpeg_file = fopen(jpeg_name, "w");
-                    //write jpeg image
-                    fwrite(jpeg_image, 1,sizeof(jpeg_image),jpeg_file);
-                    con ++;
-                }
-                else
+                if (jpeg_file != NULL)
                 {
                     fclose(jpeg_file);
-
-                    sprintf(jpeg_name, "%03i.jpeg",con);
-                    //Create a jpeg file
-                    jpeg_file = fopen(jpeg_name, "w");
-                    //write jpeg image
-                    fwrite(jpeg_image, 1,sizeof(jpeg_image),jpeg_file);
-                    con ++;
                 }
-
+ 
+                //Set jpeg name
+                sprintf(jpeg_name, "%03i.jpg",con);
+                //Create a jpeg file
+                jpeg_file = fopen(jpeg_name, "w");
+                //write jpeg image
+                fwrite(jpeg_image, 1,sizeof(jpeg_image),jpeg_file);
+                con ++;
+                
             }
-        
-        
         else
         {
-            if (first_jpeg)
+            if (jpeg_file != NULL)
             {
                 fwrite(jpeg_image, 1,sizeof(jpeg_image),jpeg_file);
             }
@@ -70,9 +59,5 @@ int main(int argc, char *argv[])
     
     fclose(jpeg_file);
     fclose(memory_file);
-
-    
-
     return 0;
 }
-
