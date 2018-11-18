@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
                 {
                     fclose(jpeg_file);
                 }
- 
+
                 //Set jpeg name
                 sprintf(jpeg_name, "%03i.jpg",con);
                 //Create a jpeg file
@@ -46,18 +46,23 @@ int main(int argc, char *argv[])
                 //write jpeg image
                 fwrite(jpeg_image, 1,sizeof(jpeg_image),jpeg_file);
                 con ++;
-                
+
             }
+
+
         else
-        {
-            if (jpeg_file != NULL)
             {
-                fwrite(jpeg_image, 1,sizeof(jpeg_image),jpeg_file);
+                if (jpeg_file != NULL)
+                {
+                    fwrite(jpeg_image, 1,sizeof(jpeg_image),jpeg_file);
+                }
             }
-        }
     }
-    
+
     fclose(jpeg_file);
     fclose(memory_file);
+
+
+
     return 0;
 }
