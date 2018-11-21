@@ -5,6 +5,8 @@
 #define BLOCK_SIZE 512
 
 typedef uint8_t BYTE;
+bool is_header (BYTE jpeg_image[512]);
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -29,10 +31,7 @@ int main(int argc, char *argv[])
     while( fread(jpeg_image,1,sizeof(jpeg_image), memory_file)  != 0x00)
     {
         //It's a jpeg?
-        if (jpeg_image[0] == 0xff &&
-            jpeg_image[1] == 0xd8 &&
-            jpeg_image[2] == 0xff &&
-            (jpeg_image[3] & 0xf0) == 0xe0)
+        if (is_header(jpeg_image))
             {
                 if (jpeg_file != NULL)
                 {
@@ -66,3 +65,17 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+bool is_header (BYTE jpeg_image[512])
+{
+    if (jpeg_image[0] == 0xff &&
+        jpeg_image[1] == 0xd8 &&
+        jpeg_image[2] == 0xff &&
+        (jpeg_image[3] & 0xf0) == 0xe0)
+        {
+            return true;
+        }
+            
+    return false;
+}
+

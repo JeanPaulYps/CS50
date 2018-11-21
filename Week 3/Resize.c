@@ -5,6 +5,9 @@
 
 #include "bmp.h"
 
+int get_padding (BITMAPINFOHEADER bi);
+void copy_bits_in_new_file (FILE *out, BITMAPINFOHEADER bi_output, int scale);
+
 int main(int argc, char *argv[])
 {
     // ensure proper usage
@@ -65,13 +68,11 @@ int main(int argc, char *argv[])
     bi_output.biWidth = bi.biWidth * scale;
 
 
-    int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
-    int padding_output = (4 - (bi_output.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    int padding = get_padding(bi);
+    int padding_output = get_padding(bi_output);
 
     bi_output.biSizeImage = (bi_output.biWidth *sizeof(RGBTRIPLE) + padding_output) * abs(bi_output.biHeight);
     bf_output.bfSize = bi_output.biSizeImage + 54;
-
-    //printf("The size Image is: %i\n",bf_output.bfSize);
 
 
     // write outfile's BITMAPFILEHEADER
@@ -104,9 +105,8 @@ int main(int argc, char *argv[])
         // skip over padding, if any
         fseek(inptr, padding, SEEK_CUR);
 
-        //fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
 
-        for(int p = 0; p < scale; p++)
+        for(int p = 0,height = scale; p < height; p++)
         {
             for (int x = 0; x < bi_output.biWidth ; x++)
             {
@@ -129,4 +129,10 @@ int main(int argc, char *argv[])
     // success
     return 0;
 }
-//./resize 4 small.bmp large.bmp
+
+int get_padding (BITMAPINFOHEADER bi)
+{
+    int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    return padding;
+}
+
