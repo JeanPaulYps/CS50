@@ -5,34 +5,32 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
 #include "dictionary.h"
-
-// Defines new methods
-int getposition(char letter);
-
-
-// Represents number of children for each node in a trie
-#define N 27
 
 // Represents a node in a trie
 typedef struct node
 {
     bool is_word;
-    struct node *children[N];
+    char letter;
+    struct node *next_letter;
+    struct node *children;
 }
 node;
-
-bool erase_dictionary (node* temp);
 // Represents a trie
 node *root;
+int con = 0;
 
-unsigned int WORDS_IN_DICTIONARY;
+
+node* searchLetter (node* node, char letter);
+bool erase_dictionary (node* temp);
+void insert_word (char word []);
+void add_child (node* father, char letter);
+void add_next_letter (node* father, char letter);
+
 
 // Loads dictionary into memory, returning true if successful else false
 bool load(const char *dictionary)
 {
-    WORDS_IN_DICTIONARY = 0;
     // Initialize trie
     root = malloc(sizeof(node));
     if (root == NULL)
@@ -40,10 +38,9 @@ bool load(const char *dictionary)
         return false;
     }
     root->is_word = false;
-    for (int i = 0; i < N; i++)
-    {
-        root->children[i] = NULL;
-    }
+    root->next_letter = NULL;
+    root->children = NULL;
+    root->letter = '\0';
 
     // Open dictionary
     FILE *file = fopen(dictionary, "r");
@@ -55,99 +52,94 @@ bool load(const char *dictionary)
 
     // Buffer for a word
     char word[LENGTH + 1];
-    int con = 0;
+
     // Insert words into trie
     while (fscanf(file, "%s", word) != EOF)
     {
         // TODO
-        char letter;
-        node *temp = root;
-        int word_size = strlen(word);
-        for ( int i = 0; i < word_size; i++ )
-        {
-            letter = word[i];
-            int position = getposition(letter);
-
-            if (temp->children[position] == NULL && position != -1)
-            {
-                node *new_node;
-                new_node = malloc(sizeof(node));
-
-                if(i == word_size - 1) (*new_node).is_word = true;
-                else (*new_node).is_word = false;
-
-                for (int j = 0; j < N; j++) (*new_node).children[j] = NULL;
-
-                temp->children[position] = new_node;
-                temp = new_node;
-            }
-            else
-            {
-                if (i == word_size - 1) temp -> children[position] -> is_word = true;
-                else
-                {
-                    temp = temp->children[position];
-                }
-            }
-
-        }
-
-        WORDS_IN_DICTIONARY ++;
+        insert_word(word);
+        con ++;
     }
 
     // Close dictionary
     fclose(file);
+
     // Indicate success
     return true;
+}
+
+void insert_word (char word [])
+{
+    node *temp = root;
+    int word_size = strlen(word);
+    char letter;
+    for ( int i = 0; i < word_size; i++ )
+    {
+        letter = word[i];
+
+        if (temp->children != NULL)
+        {
+            temp = temp->children;
+            temp = searchLetter (temp, letter);
+            if (temp->letter != letter)
+            {
+                add_next_letter(temp, letter);
+                temp = temp->next_letter;
+            }
+            
+        }
+        else
+        {
+            add_child (temp,letter);
+            temp = temp->children;
+        }
+
+        if(i == word_size - 1) 
+            temp->is_word = true;
+            
+        
+    }
 }
 
 // Returns number of words in dictionary if loaded else 0 if not yet loaded
 unsigned int size(void)
 {
-    // TODO
-    return WORDS_IN_DICTIONARY;
+    return con;
 }
 
 // Returns true if word is in dictionary else false
 bool check(const char *word)
 {
-    // TODO
     node *temp = root;
-    int position = -1;
     int word_size = strlen(word);
-    for(int i = 0; i < word_size; i++)
+    char letter;
+    for ( int i = 0; i < word_size; i++ )
     {
-        char letter = word[i];
-        letter = tolower(letter);
-        position = getposition(letter);
+        letter = word[i];
 
-        if (position != -1)
-        {
-            if(temp->children[position] != NULL)
-            {
-                temp = temp->children[position];
-                if (i == word_size -1)
-                {
-                    bool is_a_word = (*temp).is_word;
-                    if(is_a_word)
-                        return true;
-                    else
-                        return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
+        if (temp->children == NULL)
         {
             return false;
         }
-
+        else
+        {
+            letter = tolower(letter);
+            temp = temp->children;
+            temp = searchLetter (temp, letter);
+            if (temp->letter != letter)
+            {
+                return false; 
+            }
+            else
+            {   
+                if(i == (word_size - 1) && temp->is_word) 
+                    return true;
+            }
+        }
+            
+        
     }
     return false;
-
 }
 
 // Unloads dictionary from memory, returning true if successful else false
@@ -158,25 +150,56 @@ bool unload(void)
 
 bool erase_dictionary (node* temp)
 {
-    for (int i = 0; i <N; i++)
-    {
-        if (temp->children[i] != NULL)
-        {
-            erase_dictionary(temp->children[i]);
-        }
-    }
+
+    if (temp->children != NULL)
+        erase_dictionary(temp->children);
+    if (temp->next_letter != NULL)
+        erase_dictionary(temp->next_letter);
+    
     free(temp);
     return true;
 }
-int getposition(char letter)
+
+node* searchLetter (node* temp, char letter)
 {
-    char alphabet [] = "abcdefghijklmnopqrstuvwxyz'";
-    for (int i = 0; i < N; i++)
+    do
     {
-        if (letter == alphabet[i])
+        char node_letter =  temp->letter;
+        if (node_letter == letter)
         {
-            return i;
+            return temp;
         }
-    }
-    return -1;
+        else
+        {
+            if (temp->next_letter != NULL)
+            {
+                temp = temp->next_letter; 
+            }
+            else
+            {
+                return temp;
+            }
+        }
+    }while (true);
+}
+
+void add_child (node* father, char letter)
+{
+    node *new_node;
+    new_node = malloc(sizeof(node));
+    new_node->letter = letter;
+    new_node->next_letter = NULL;
+    new_node->is_word = false;
+
+    father->children = new_node;
+}
+void add_next_letter (node* father, char letter)
+{
+    node *new_node;
+    new_node = malloc(sizeof(node));
+    new_node->letter = letter;
+    new_node->children = NULL;
+    new_node->is_word = false;
+
+    father->next_letter = new_node;
 }
