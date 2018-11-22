@@ -12,8 +12,11 @@ typedef struct node
 {
     bool is_word;
     char letter;
+    bool has_children;
+    bool has_next_letter;
     struct node *next_letter;
     struct node *children;
+
 }
 node;
 // Represents a trie
@@ -41,6 +44,8 @@ bool load(const char *dictionary)
     root->next_letter = NULL;
     root->children = NULL;
     root->letter = '\0';
+    root-> has_children = false;
+    root-> has_next_letter = false;
 
     // Open dictionary
     FILE *file = fopen(dictionary, "r");
@@ -77,7 +82,7 @@ void insert_word (char word [])
     {
         letter = word[i];
 
-        if (temp->children != NULL)
+        if (temp->has_children )
         {
             temp = temp->children;
             temp = searchLetter (temp, letter);
@@ -86,7 +91,7 @@ void insert_word (char word [])
                 add_next_letter(temp, letter);
                 temp = temp->next_letter;
             }
-            
+
         }
         else
         {
@@ -94,10 +99,10 @@ void insert_word (char word [])
             temp = temp->children;
         }
 
-        if(i == word_size - 1) 
+        if(i == word_size - 1)
             temp->is_word = true;
-            
-        
+
+
     }
 }
 
@@ -117,27 +122,27 @@ bool check(const char *word)
     {
         letter = word[i];
 
-        if (temp->children == NULL)
-        {
-            return false;
-        }
-        else
+        if(temp->has_children)
         {
             letter = tolower(letter);
             temp = temp->children;
             temp = searchLetter (temp, letter);
             if (temp->letter != letter)
             {
-                return false; 
+                return false;
             }
             else
-            {   
-                if(i == (word_size - 1) && temp->is_word) 
+            {
+                if(i == (word_size - 1) && temp->is_word)
                     return true;
             }
         }
-            
-        
+        else
+        {
+            return false;
+        }
+
+
     }
     return false;
 }
@@ -151,11 +156,11 @@ bool unload(void)
 bool erase_dictionary (node* temp)
 {
 
-    if (temp->children != NULL)
+    if (temp->has_children)
         erase_dictionary(temp->children);
-    if (temp->next_letter != NULL)
+    if (temp->has_next_letter)
         erase_dictionary(temp->next_letter);
-    
+
     free(temp);
     return true;
 }
@@ -171,9 +176,9 @@ node* searchLetter (node* temp, char letter)
         }
         else
         {
-            if (temp->next_letter != NULL)
+            if (temp->has_next_letter)
             {
-                temp = temp->next_letter; 
+                temp = temp->next_letter;
             }
             else
             {
@@ -190,8 +195,11 @@ void add_child (node* father, char letter)
     new_node->letter = letter;
     new_node->next_letter = NULL;
     new_node->is_word = false;
+    new_node->has_children = false;
+    new_node->has_next_letter = false;
 
     father->children = new_node;
+    father->has_children = true;
 }
 void add_next_letter (node* father, char letter)
 {
@@ -200,6 +208,9 @@ void add_next_letter (node* father, char letter)
     new_node->letter = letter;
     new_node->children = NULL;
     new_node->is_word = false;
+    new_node->has_children = false;
+    new_node->has_next_letter = false;
 
     father->next_letter = new_node;
+    father->has_next_letter = true;
 }
