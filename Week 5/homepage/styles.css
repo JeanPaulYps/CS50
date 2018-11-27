@@ -1,0 +1,37 @@
+body
+{
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    margin: 50px 75px 50px 75px;
+    border-color: black;
+    border-top: 10px solid black;
+    border-bottom: 10px solid black;
+    border-left: 10px solid black;
+    border-right: 10px solid black;
+   
+    
+}
+h1
+{
+    text-align: center;
+}
+.specialImage
+{
+    float: right;
+    overflow: auto;
+}
+.twitter
+{
+    list-style: none;
+    
+}
+.instagram
+{
+    list-style: none;
+}
+div
+{
+    overflow: auto;
+}
