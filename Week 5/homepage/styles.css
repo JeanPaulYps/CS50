@@ -17,11 +17,6 @@ h1
 {
     text-align: center;
 }
-.specialImage
-{
-    float: right;
-    overflow: auto;
-}
 .twitter
 {
     list-style: none;
@@ -34,4 +29,9 @@ h1
 div
 {
     overflow: auto;
+}
+p
+{
+    text-align: justify;
+    border-right: 10px;
 }
