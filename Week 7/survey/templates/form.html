@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block main %}
+
+    <h1 class="mb-3">Form</h1>
+    <form action="/form" method="post">
+        <div class="form-group">
+            Insert your name: <input type="text" name="name">
+        </div>
+
+        <div class = "form-group">
+            Your age: <input type="number" min="1" name = "age">
+        </div>
+
+        <div class="form-group">
+            <label class = "form-check-label"> You like pineapple in pizza: &nbsp; </label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="pineapple" value="yes">
+              <label class="form-check-label">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="pineapple" value="no">
+              <label class="form-check-label">No</label>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Submit</button>
+
+    </form>
+    <div class="form-check form-check-inline">
+
+    <script>
+
+        /* TODO */
+
+    </script>
+    <script>
+
+        /* TODO */
+
+    </script>
+
+{% endblock %}
