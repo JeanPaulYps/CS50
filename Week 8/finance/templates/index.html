@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+    <table class = "table table-striped">
+        <tr>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>Shares</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+        {% for action in actions %}
+        <tr>
+            <td>{{ action["symbolAction"] }}</td>
+            <td>{{ action["nameAction"] }}  </td>
+            <td>{{ action["sum(numberAction)"] }}</td>
+            <td>{{ action["priceAction"] }} </td>
+            <td>{{ action["total"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}
